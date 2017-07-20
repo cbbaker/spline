@@ -1,32 +1,66 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
+
 import './App.css';
+
 import Tile from './Tile';
 
 class App extends Component {
-  render() {
-    const width = 128;
-    const height = 128;
-    const tileProps = {
-      width,
-      height,
-      outlineWidth: 1,
-      outlineColor: "rgb(128,128,128)",
-      curveWidth: 2,
-      curveColor: "rgb(16,16, 16)",
-      controlPoints: [
-        [  0,  48],
-        [ 64,  48],
-        [ 64,  48],
-        [ 64,  96],
-        [ 64,  48],
-        [ 64,  48],
-        [127,  48]
-      ]
+  constructor(props) {
+    super(props);
+    this.state = {
+      pointLists: props.pointLists,
+      ui: true
     };
+  }
+
+  componentDidMount() {
+    const svg = ReactDOM.findDOMNode(this.refs.svg);
+    if (svg && svg.createSVGPoint) {
+      console.log("svg: " + svg);
+      const tmpPt = svg.createSVGPoint();
+      if (tmpPt) {
+        this.setState({tmpPt});
+      }
+    }
+    $(document).keypress((e) => {
+      if (e.which === 32) {
+        e.preventDefault();
+        this.setState({ui: !this.state.ui});
+      }
+    });
+  }
+
+  movePoint([list, index], [newX, newY]) {
+    const {width, height} = this.props;
+    
+    var {pointLists} = this.state;
+    var points = pointLists[list];
+    var [oldX, oldY] = points[index];
+
+    if (index === 0 || index === points.length - 1) {
+      if (oldX === 0) {
+        points[0] = [0, newY / height];
+        points[points.length - 1] = [1, newY / height];
+      } else if (oldY === 0) {
+        points[0] = [newX / width, 0];
+        points[points.length - 1] = [newX / width, 1];
+      }
+    } else {
+      points[index] = [newX / width, newY / height];
+    }
+
+    this.setState({pointLists});
+  }
+
+  render() {
+    const {width, height} = this.props;
+    var tileProps = Object.assign({movePoint: (i, pt) => this.movePoint(i, pt)}, this.state, this.props);
 
     const tileAt = (x, y) => {
       const trans = "translate(" + x + "," + y + ")";
-      return (<Tile transform={trans} {...tileProps} />);
+      return (<Tile key={trans} transform={trans} {...tileProps} />);
     };
 
     var children = [];
@@ -37,11 +71,24 @@ class App extends Component {
     }
 
     return (
-      <svg width="640" height="480">
+      <svg ref="svg" width="1280" height="960">
         {children}
       </svg>
     );
   }
-}
+};
+
+App.defaultProps = {
+  width: 256,
+  height: 256,
+  outlineWidth: 1,
+  outlineColor: "rgb(200,200,200)",
+  curveWidth: 2,
+  curveColor: "rgb(16,16, 16)",
+  pointRadius: 5,
+  pointColor: "rgb(100,200,200)",
+  pointLists: [[[0, 0.25], [0.5, 0.65], [0.3, 0.75], [0.4, 0.25], [1, 0.25]],
+               [[0.25, 0], [0.3, 0.75], [0.5, 0.65], [0.9, 0.75], [0.25, 1]]]
+};
 
 export default App;
