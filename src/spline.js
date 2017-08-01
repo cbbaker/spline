@@ -29,11 +29,9 @@ export function computePolynomials(pts) {
   const matrix = createMatrix(splineCount);
   const invMatrix = math.inv(matrix);
   const coefficientMatrix = math.subset(invMatrix, math.index(math.range(0, dim), math.range(0, dim, 3)));
-  const [xs, ys] = math.transpose(pts);
-  const xPolynomials = coefficientHelper(coefficientMatrix, xs);
-  const yPolynomials = coefficientHelper(coefficientMatrix, ys);
 
-  return [xPolynomials, yPolynomials];
+  const coords = math.transpose(pts);
+  return coords.map(coord => coefficientHelper(coefficientMatrix, coord));
 };
 
 export function coefficientHelper(matrix, values) {
