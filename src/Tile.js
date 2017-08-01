@@ -10,12 +10,23 @@ export default class Tile extends Component {
     this.state = {dragging: null};
     this.onMouseMove = this.mouseMoveHandler.bind(this);
     this.onMouseUp = this.mouseUpHandler.bind(this);
+    this.onTouchMove = this.touchMoveHandler.bind(this);
+    this.onTouchEnd = this.touchEndHandler.bind(this);
   }
 
   onMouseDown(list, index, e) {
     this.setState({dragging: [list, index]});
     $(document).mousemove(this.onMouseMove);
     $(document).mouseup(this.onMouseUp);
+  }
+
+  onTouchStart(list, index, e) {
+    if (e.originalEvent.touches.length === 1) {
+      e.preventDefault();
+      this.setState({dragging: [list, index]});
+      $(document).touchmove(this.onTouchMove);
+      $(document).touchend(this.onTouchEnd);
+    }
   }
 
   mouseMoveHandler(e) {
@@ -35,6 +46,28 @@ export default class Tile extends Component {
     $(document).unbind('mouseup', this.onMouseUp);
   }
 
+  touchMoveHandler(e) {
+    var g = ReactDOM.findDOMNode(this.refs.g);
+    var {tmpPt, movePoint} = this.props;
+    if (e.originalEvent.touches.length === 1
+        && g && tmpPt
+        && this.state.dragging !== null) {
+      e.preventDefault();
+      const touch = e.originalEvent.touches[0];
+      tmpPt.x = touch.clientX;
+      tmpPt.y = touch.clientY;
+      var local = tmpPt.matrixTransform(g.getScreenCTM().inverse());
+      movePoint(this.state.dragging, [local.x, local.y]);
+    }
+  }
+
+  touchEndHandler(e) {
+    if (e.originalEvent.touches.length === 0) {
+      e.preventDefault();
+      $(document).unbind('mousemove', this.onTouchMove);
+      $(document).unbind('mouseup', this.onTouchEnd);
+    }
+  }
 
   render() {
     const {curveProps,
@@ -47,7 +80,11 @@ export default class Tile extends Component {
           } = this.props;
 
     const curves = curveProps.map((props, listIdx) => {
-      return (<Curve key={listIdx} listIdx={listIdx} onMouseDown={this.onMouseDown.bind(this, listIdx)} {...props} />);
+      return (
+          <Curve key={listIdx} listIdx={listIdx}
+                 onMouseDown={this.onMouseDown.bind(this, listIdx)}
+                 onTouchStart={this.onTouchStart.bind(this, listIdx)}
+                 {...props} />);
     });
 
     const rectStyle = {

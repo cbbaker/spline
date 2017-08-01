@@ -1,7 +1,9 @@
 import React from 'react';
 
-export default ({x, y, radius, color, onMouseDown}) => {
+export default ({x, y, radius, color, onMouseDown, onTouchStart}) => {
   return (
-    <circle onMouseDown={onMouseDown} cx={x} cy={y} r={radius} fill={color} />
+    <circle onMouseDown={onMouseDown}
+            onTouchStart={onTouchStart}
+            cx={x} cy={y} r={radius} fill={color} />
   );
 };

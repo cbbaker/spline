@@ -16,6 +16,10 @@ class App extends Component {
     };
   }
 
+  componentWillMount() {
+    // React.initializeTouchEvents(true);
+  }
+
   componentDidMount() {
     const svg = ReactDOM.findDOMNode(this.refs.svg);
     if (svg && svg.createSVGPoint) {
