@@ -10,6 +10,7 @@ import Tile from './Tile';
 class App extends Component {
   constructor(props) {
     super(props);
+    console.log(props.pointLists);
     this.state = {
       pointLists: props.pointLists,
       ui: true
@@ -118,6 +119,36 @@ class App extends Component {
   }
 };
 
+// function makePointLists() {
+//   const start = [0, 0.25];
+//   const end = [1, start[1]];
+//   const int1 = [[0.4, 0.25], [0.6, 0.75]];
+//   const int2 = [int1[1], int1[0]];
+//   return [int1, int2].map(i => new PointList([start].concat(i).concat([end])));
+// }
+
+// function makePointLists() {
+//     const int = [[0.4, 0.25], [0.6, 0.25], [0.6, 0.75]];
+//     return [[0, 0.75], [0.25, 0]].map(start => {
+//         const end = start[0] === 0 ? [1, start[1]] : [start[0], 1];
+//         return new PointList([start].concat(int).concat([end]));
+//     });
+// }
+
+function makePointLists() {
+    const n = 4;
+    const x0 = Math.random();
+    const y0 = Math.random();
+    var int = [];
+    for (var i = 0; i < n; ++i) {
+        int.push([Math.random(), Math.random()]);
+    }
+    return [[0, y0], [x0, 0]].map(start => {
+        const end = start[0] === 0 ? [1, start[1]] : [start[0], 1];
+        return new PointList([start].concat(int).concat([end]));
+    });
+}
+
 App.defaultProps = {
   width: 256,
   height: 256,
@@ -127,8 +158,9 @@ App.defaultProps = {
   curveColor: "rgb(16,16, 16)",
   pointRadius: 5,
   pointColor: "rgb(100,200,200)",
-  pointLists: [new PointList([[0, 0.25], [0.5, 0.65], [0.3, 0.75], [0.4, 0.25], [1, 0.25]]),
-               new PointList([[0.25, 0], [0.3, 0.75], [0.5, 0.65], [0.9, 0.75], [0.25, 1]])]
+  // pointLists: [new PointList([[0, 0.25], [0.5, 0.65], [0.3, 0.75], [0.4, 0.25], [1, 0.25]]),
+  //              new PointList([[0.25, 0], [0.3, 0.75], [0.5, 0.65], [0.9, 0.75], [0.25, 1]])]
+  pointLists: makePointLists()
 };
 
 export default App;

@@ -1,6 +1,7 @@
 export default class Polynomial {
-    constructor(coefficients) {
+    constructor(coefficients, knot) {
         this.coefficients = coefficients;
+        this.knot = knot;
     }
 
     evalAt(t) {
@@ -22,7 +23,7 @@ export default class Polynomial {
             coefficients.push(this.coefficients[i] * i);
         }
 
-        return new Polynomial(coefficients);
+        return new Polynomial(coefficients, this.knot);
     }
 
     toString() {
@@ -55,7 +56,10 @@ export default class Polynomial {
     }
 
     toControlPoints() {
-        const [c0 = 0.0, c1 = 0.0, c2 = 0.0, c3 = 0.0] = this.coefficients;
+        const c0 = this.coefficients[0];
+        const c1 = this.coefficients[1] * this.knot;
+        const c2 = this.coefficients[2] * this.knot * this.knot;
+        const c3 = this.coefficients[3] * this.knot * this.knot * this.knot;
         return [c0,
                 c0 + c1 / 3,
                 c0 + 2 * c1 / 3 + c2 / 3,
