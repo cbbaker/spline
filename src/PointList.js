@@ -30,6 +30,7 @@ export default class PointList {
   }
 
   movePoint(index, newPoint) {
-    this.points[index] = newPoint;
+    this.points[index][0] = newPoint[0];
+    this.points[index][1] = newPoint[1];
   }
 };
