@@ -1,0 +1,50 @@
+export default class CurveProps {
+  constructor(spline, defaults) {
+    this.spline = spline;
+    this.props = defaults;
+    if (defaults.bezierSplit !== undefined) {
+      this.computeLines();
+    } else {
+      this.computePath();
+    }
+  }
+
+  computeLines() {
+    const {
+      spline,
+      props: {
+        width,
+        height,
+        bezierSplit,
+        colorMin,
+        colorMax
+      }
+    } = this;
+    const splinePoints = spline.flattenedPoints(bezierSplit);
+
+    const clamp = (value) => {
+      const newValue = colorMin + (colorMax - colorMin) * value;
+      return Math.max(colorMin, Math.min(240, Math.floor(newValue)));
+    };
+
+    this.props.splinePoints = splinePoints.map(([x, y, c]) => {
+      return [x * width, y * height, clamp(c)];
+    });
+  }
+
+  computePath() {
+    const {spline, props: {width, height}} = this;
+    const controlPoints = spline.flattenedControlPoints();
+    const [x1, y1] = controlPoints[0];
+    var result = "M " + (x1 * width) + "," + (y1 * height);
+    for (var i = 1; i < controlPoints.length; i += 3) {
+      const [x2, y2] = controlPoints[i];
+      const [x3, y3] = controlPoints[i+1];
+      const [x4, y4] = controlPoints[i+2];
+      result += " C " + (x2 * width) + "," + (y2 * height)
+          + " " + (x3 * width) + "," + (y3 * height) + " " + (x4 * width) + "," + (y4 * height);
+    }
+
+    this.props.d = result;
+  }
+}
