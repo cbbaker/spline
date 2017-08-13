@@ -4,7 +4,8 @@ import $ from 'jquery';
 
 import './App.css';
 
-import PointList from './PointList';
+import Spline from './spline';
+import CurveProps from './curveProps';
 import Tile from './Tile';
 
 class App extends Component {
@@ -13,7 +14,8 @@ class App extends Component {
     console.log(props.pointLists);
     this.state = {
       pointLists: props.pointLists,
-      ui: true
+      ui: false,
+      bezierSplit: 5
     };
   }
 
@@ -26,10 +28,33 @@ class App extends Component {
       }
     }
     $(document).keypress((e) => {
-      if (e.which === 32) {
+      var {ui, bezierSplit} = this.state;
+      switch (e.which) {
+      case 32: // space
         e.preventDefault();
-        this.setState({ui: !this.state.ui});
+        ui = !ui;
+        break;
+      case 43: // plus
+      case 61: // equal
+        e.preventDefault();
+        if (bezierSplit !== undefined) {
+          ++bezierSplit;
+        } else {
+          bezierSplit = 1;
+        }
+        break;
+      case 45: // minus
+        e.preventDefault();
+        if (this.state.bezierSplit > 1)
+        {
+          --bezierSplit;
+        } else {
+          bezierSplit = undefined;
+        }
+        break;
+      default:
       }
+      this.setState({ui, bezierSplit});
     });
   }
 
@@ -37,70 +62,82 @@ class App extends Component {
     const {width, height} = this.props;
     
     var {pointLists} = this.state;
-    var pointList = pointLists[list];
-      var points = pointList.points;
+    var points = pointLists[list];
     var [oldX, oldY] = points[index];
 
     if (index === 0 || index === points.length - 1) {
       if (oldX === 0) {
         var y = newY / height;
-        pointList.movePoint(0, [0, y]);
-        pointList.movePoint(points.length - 1, [1, y]);
+        points[0][0] = 0;
+        points[0][1] = y;
+        points[points.length - 1][0] = 1;
+        points[points.length - 1][1] = y;
       } else if (oldY === 0) {
         var x = newX / width;
-        pointList.movePoint(0, [x, 0]);
-        pointList.movePoint(points.length - 1, [x, 1]);
+        points[0][0] = x;
+        points[0][1] = 0;
+        points[points.length - 1][0] = x;
+        points[points.length - 1][1] = 1;
       }
     } else {
-      pointList.movePoint(index, [newX / width, newY / height]);
+      points[index][0] = newX / width;
+      points[index][1] = newY / height;
     }
 
     this.setState({pointLists});
   }
 
-  pathDescription(controlPoints) {
-    const {width, height} = this.props;
-    const [x1, y1] = controlPoints[0];
-    var result = "M " + (x1 * width) + "," + (y1 * height);
-    for (var i = 1; i < controlPoints.length; i += 3) {
-      const [x2, y2] = controlPoints[i];
-      const [x3, y3] = controlPoints[i+1];
-      const [x4, y4] = controlPoints[i+2];
-      result += " C " + (x2 * width) + "," + (y2 * height)
-          + " " + (x3 * width) + "," + (y3 * height) + " " + (x4 * width) + "," + (y4 * height);
-    }
-
-    return result;
+  metric([x1, y1], [x2, y2]) {
+    const dx = x2 - x1, dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   computeCurveProps() {
-    const {pointLists, ui} = this.state;
-    const {curveColor, curveWidth, width, height, pointRadius, pointColor} = this.props;
+    const {pointLists, ui, bezierSplit} = this.state;
+    const {
+      curveColor,
+      curveWidth,
+      width,
+      height,
+      pointRadius,
+      pointColor,
+      colorMax,
+      colorMin
+    } = this.props;
+
     return pointLists.map(pointList => {
-      const controlPoints = pointList.flattenedControlPoints();
-      return {
+      const spline = new Spline(pointList, this.metric);
+      const props = new CurveProps(spline, {
         pointList,
         width,
         height,
         pointRadius,
         pointColor,
         ui,
-        d: this.pathDescription(controlPoints),
+        bezierSplit,
         stroke: curveColor,
         strokeWidth: curveWidth,
-        fill: "none"
-      };
+        fill: "none",
+        colorMax,
+        colorMin
+      });
+
+      return props.props;
     });
   }
 
   render() {
     const {width, height} = this.props;
-    var tileProps = Object.assign({movePoint: this.movePoint.bind(this)}, this.state, this.props);
+    const props = {
+      movePoint: this.movePoint.bind(this),
+      curveProps: this.computeCurveProps()
+    };
+    const tileProps = Object.assign(props, this.state, this.props);
 
     const tileAt = (x, y) => {
       const trans = "translate(" + x + "," + y + ")";
       return (
-        <Tile key={trans} transform={trans} curveProps={this.computeCurveProps()} {...tileProps} />
+        <Tile key={trans} transform={trans} {...tileProps} />
       );
     };
 
@@ -136,18 +173,23 @@ class App extends Component {
 // }
 
 function makePointLists() {
-    const n = 4;
-    const x0 = Math.random();
-    const y0 = Math.random();
-    var int = [];
-    for (var i = 0; i < n; ++i) {
-        int.push([Math.random(), Math.random()]);
-    }
-    return [[0, y0], [x0, 0]].map(start => {
-        const end = start[0] === 0 ? [1, start[1]] : [start[0], 1];
-        return new PointList([start].concat(int).concat([end]));
-    });
+  const n = 4;
+  const x0 = Math.random();
+  const y0 = Math.random();
+  const c0 = Math.random();
+  var int = [];
+  for (var i = 0; i < n; ++i) {
+    int.push([Math.random(), Math.random(), Math.random()]);
+  }
+  return [[0, y0, c0], [x0, 0, c0]].map(start => {
+    const end = start[0] === 0 ? [1, start[1], start[2]] : [start[0], 1, start[2]];
+    return [start].concat(int).concat([end]);
+  });
 }
+
+// function makePointLists() {
+//   return [[[0, 0, 0], [1/2, 1/3, 1/2], [1/2, 2/3, 1/2], [1, 1, 0]]];
+// }
 
 App.defaultProps = {
   width: 256,
@@ -156,6 +198,8 @@ App.defaultProps = {
   outlineColor: "rgb(200,200,200)",
   curveWidth: 2,
   curveColor: "rgb(16,16, 16)",
+  colorMin: 16,
+  colorMax: 220,
   pointRadius: 5,
   pointColor: "rgb(100,200,200)",
   // pointLists: [new PointList([[0, 0.25], [0.5, 0.65], [0.3, 0.75], [0.4, 0.25], [1, 0.25]]),
