@@ -117,7 +117,7 @@ class App extends Component {
     Object.assign(props, this.state, this.props);
 
     return (
-      <Router>
+      <Router basename='/spline'>
         <div>
           <NavBar {...props}/>
           <Route exact path='/' component={Home}/>
