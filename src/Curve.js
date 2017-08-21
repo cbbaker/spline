@@ -1,10 +1,13 @@
 import React from 'react';
 import Point from './Point';
 
-export default (props) => {
-  const {pointList, ui, width, height, pointRadius, pointColor, listIdx, onMouseDown, d, stroke, strokeWidth, fill, splinePoints } = props;
+export default ({
+  pointList, pointPool, ui, width, height, pointRadius, pointColor, listIdx,
+  onMouseDown, d, stroke, strokeWidth, fill, splinePoints 
+}) => {
   
-  const pointControls = ui && pointList.map(([x, y], pointIdx) => {
+  const pointControls = ui && pointList.map((offset, pointIdx) => {
+    const [x, y] = pointPool[offset];
     return (
       <Point x={x*width} y={y*height}
              radius={pointRadius} color={pointColor} 
@@ -28,6 +31,7 @@ export default (props) => {
     for(var i = 1; i < splinePoints.length; i++) {
       let [x1, y1] = splinePoints[i-1], [x2, y2, c2] = splinePoints[i];
       const lineProps = {
+        key: i,
         x1, y1, x2, y2,
         stroke: "black",
         strokeWidth,
