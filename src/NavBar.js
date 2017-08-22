@@ -16,6 +16,7 @@ export default ({saveDocument}) => {
         <Navbar.Brand>
           <Link to="/">Spline Editor</Link>
         </Navbar.Brand>
+        <Navbar.Toggle />
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
