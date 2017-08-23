@@ -61,10 +61,10 @@ class Work extends Component {
 
   computeTmpPt() {
     const svg = ReactDOM.findDOMNode(this.refs.svg);
-    if (this.state.tmpPt === undefined && svg && svg.createSVGPoint) {
+    if (this.props.setTmpPt && svg && svg.createSVGPoint) {
       const tmpPt = svg.createSVGPoint();
       if (tmpPt) {
-        this.setState({tmpPt});
+        this.props.setTmpPt(tmpPt);
       }
     }
   }
