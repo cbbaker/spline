@@ -29,4 +29,13 @@ export default class Section {
       return [this];
     }
   }
+
+  adaptiveSplit(condition) {
+    if (condition(this)) {
+      return [this];
+    } else {
+      let halves = this.halve();
+      return _.flatMap(halves, section => section.adaptiveSplit(condition));
+    }
+  }
 }

@@ -61,10 +61,10 @@ class Work extends Component {
 
   computeTmpPt() {
     const svg = ReactDOM.findDOMNode(this.refs.svg);
-    if (this.state.tmpPt === undefined && svg && svg.createSVGPoint) {
+    if (this.props.setTmpPt && svg && svg.createSVGPoint) {
       const tmpPt = svg.createSVGPoint();
       if (tmpPt) {
-        this.setState({tmpPt});
+        this.props.setTmpPt(tmpPt);
       }
     }
   }
@@ -74,8 +74,8 @@ class Work extends Component {
   }
 
   computeCurveProps() {
-    const {document: {pointLists, pointPool}, ui, bezierSplit} = this.props;
-    const {
+    const {document: {pointLists, pointPool}, ui, dragging} = this.props;
+    var {
       curveColor,
       curveWidth,
       width,
@@ -85,6 +85,11 @@ class Work extends Component {
       colorMax,
       colorMin
     } = this.props;
+    var bezierSplit = true;
+    if (dragging) {
+      bezierSplit = false;
+      curveColor = "lightgray";
+    }
 
     return pointLists.map(pointList => {
       const points = pointList.map(point => pointPool[point]);

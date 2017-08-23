@@ -116,6 +116,10 @@ export default class Spline {
     return _.flatMap(this.sections, section => section.split(iterations));
   }
 
+  adaptiveSplit(condition) {
+    return _.flatMap(this.sections, section => section.adaptiveSplit(condition));
+  }
+
   flattenedPoints(iterations) {
     const sections = this.split(iterations);
     return sections.map(section => section.controls[0]).concat([sections[sections.length - 1].controls[3]]);

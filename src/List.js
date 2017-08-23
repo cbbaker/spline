@@ -19,7 +19,6 @@ export default (props) => {
 
   const computeCurveProps = ({pointLists, pointPool}) => {
     const {
-      bezierSplit,
       curveColor,
       curveWidth,
       width,
@@ -40,7 +39,7 @@ export default (props) => {
         pointRadius,
         pointColor,
         ui: false,
-        bezierSplit,
+        bezierSplit: true,
         stroke: curveColor,
         strokeWidth: curveWidth,
         fill: "none",

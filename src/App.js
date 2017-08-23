@@ -33,8 +33,11 @@ class App extends Component {
     super(props);
     this.state = {
       ui: false,
-      bezierSplit: 5
+      dragging: null
     };
+
+    this.onMouseMove = this.mouseMoveHandler.bind(this);
+    this.onMouseUp = this.mouseUpHandler.bind(this);
   }
 
   componentDidMount() {
@@ -49,6 +52,33 @@ class App extends Component {
       }
       this.setState({ui});
     });
+  }
+
+  onMouseDown(list, index, g) {
+    this.setState({dragging: [list, index, g]});
+    $(document).mousemove(this.onMouseMove);
+    $(document).mouseup(this.onMouseUp);
+  }
+
+  mouseMoveHandler(e) {
+    var {tmpPt, dragging} = this.state;
+    if (tmpPt && dragging !== null) {
+      let g = dragging[2];
+      tmpPt.x = e.clientX;
+      tmpPt.y = e.clientY;
+      var local = tmpPt.matrixTransform(g.getScreenCTM().inverse());
+      this.movePoint(dragging, [local.x, local.y]);
+    }
+  }
+
+  mouseUpHandler(e) {
+    this.setState({dragging: null});
+    $(document).unbind('mousemove', this.onMouseMove);
+    $(document).unbind('mouseup', this.onMouseUp);
+  }
+
+  setTmpPt(tmpPt) {
+    this.setState({tmpPt});
   }
 
   newDocument() {
@@ -67,10 +97,6 @@ class App extends Component {
 
   setUI(on) {
     this.setState({ui: on});
-  }
-
-  setBezierSplit(iterations) {
-    this.setState({bezierSplit: iterations});
   }
 
   movePoint([list, index], [newX, newY]) {
@@ -105,14 +131,17 @@ class App extends Component {
   render () {
     var props = {};
 
-    ["newDocument",
+    ["onMouseDown",
+     "newDocument",
      "findDocument",
      "movePoint",
-     "setUI",
-     "setBezierSplit"
+     "setUI"
     ].forEach(method => props[method] = this[method].bind(this));
     if (this.state.document) {
       props["saveDocument"] = this.saveDocument.bind(this);
+    }
+    if (!this.state.tmpPt) {
+      props["setTmpPt"] = this.setTmpPt.bind(this);
     }
     Object.assign(props, this.state, this.props);
 
