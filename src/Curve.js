@@ -3,9 +3,9 @@ import Point from './Point';
 
 export default ({
   pointList, pointPool, ui, width, height, pointRadius, pointColor, listIdx,
-  onMouseDown, d, stroke, strokeWidth, fill, splinePoints 
+  onMouseDown, d, stroke, strokeWidth, fill, splinePoints, splineProps
 }) => {
-  
+  var i;
   const pointControls = ui && pointList.map((offset, pointIdx) => {
     const [x, y] = pointPool[offset];
     return (
@@ -28,7 +28,7 @@ export default ({
     );
   } else if (splinePoints !== undefined) {
     var lines = [];
-    for(var i = 1; i < splinePoints.length; i++) {
+    for(i = 1; i < splinePoints.length; i++) {
       let [x1, y1] = splinePoints[i-1], [x2, y2, c2] = splinePoints[i];
       const lineProps = {
         key: i,
@@ -48,5 +48,16 @@ export default ({
       </g>
     );
     
+  } else if (splineProps !== undefined) {
+    const splines = splineProps.map(splineProp => (
+      <path strokeWidth={strokeWidth} fill={fill} stroke={stroke} {...splineProp}/>
+    ));
+
+    return (
+      <g>
+        {splines}
+        {pointControls}
+      </g>
+    );
   }
 };

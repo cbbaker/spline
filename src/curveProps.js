@@ -3,7 +3,7 @@ export default class CurveProps {
     this.spline = spline;
     this.props = defaults;
     if (defaults.bezierSplit !== undefined) {
-      this.computeLines();
+      this.computePaths();
     } else {
       this.computePath();
     }
@@ -29,6 +29,34 @@ export default class CurveProps {
 
     this.props.splinePoints = splinePoints.map(([x, y, c]) => {
       return [x * width, y * height, clamp(c)];
+    });
+  }
+
+  computePaths() {
+    const {
+      spline,
+      props: {
+        width,
+        height,
+        bezierSplit,
+        colorMin,
+        colorMax
+      }
+    } = this;
+    const colorDiffSmall = ({controls: [[x0, y0, c0], p1, p2, [x3, y3, c3]]}) => (Math.abs(c3 - c0) < 0.02);
+    const splines = spline.adaptiveSplit(colorDiffSmall);
+
+    const clamp = (value) => {
+      const newValue = colorMin + (colorMax - colorMin) * value;
+      return Math.max(colorMin, Math.min(240, Math.floor(newValue)));
+    };
+
+    this.props.splineProps = splines.map(spline => {
+      const [[x0, y0, c0], [x1, y1], [x2, y2], [x3, y3, c3]] = spline.controls;
+      return {
+        d: `M ${x0 * width},${y0 * height} C ${x1 * width},${y1 * height} ${x2 * width},${y2 * height} ${x3 * width},${y3 * height}`,
+        strokeOpacity: clamp(0.5 * (c0 + c3)) / 256
+      };
     });
   }
 

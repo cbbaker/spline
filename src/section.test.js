@@ -33,4 +33,13 @@ describe("Section", () => {
     const section = new Section(controls);
     expect(section.split(2)).toHaveLength(4);
   });
+
+  test("adaptiveSplit splits until a condition is satisfied", () => {
+    const section = new Section(controls);
+    const condition = ({controls: [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]}) => {
+      const dx = x3 - x0, dy = y3 - y0;
+      return (dx * dx + dy * dy) < 1;
+    };
+    expect(section.adaptiveSplit(condition)).toHaveLength(2);
+  });
 });
