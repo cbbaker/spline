@@ -13,8 +13,8 @@ export default class CurveProps {
     const {
       spline,
       props: {
-        width,
-        height,
+        tileWidth,
+        tileHeight,
         bezierSplit,
         colorMin,
         colorMax
@@ -28,7 +28,7 @@ export default class CurveProps {
     };
 
     this.props.splinePoints = splinePoints.map(([x, y, c]) => {
-      return [x * width, y * height, clamp(c)];
+      return [x * tileWidth, y * tileHeight, clamp(c)];
     });
   }
 
@@ -36,8 +36,8 @@ export default class CurveProps {
     const {
       spline,
       props: {
-        width,
-        height,
+        tileWidth,
+        tileHeight,
         colorMin,
         colorMax
       }
@@ -53,23 +53,23 @@ export default class CurveProps {
     this.props.splineProps = splines.map(spline => {
       const [[x0, y0, c0], [x1, y1], [x2, y2], [x3, y3, c3]] = spline.controls;
       return {
-        d: `M ${x0 * width},${y0 * height} C ${x1 * width},${y1 * height} ${x2 * width},${y2 * height} ${x3 * width},${y3 * height}`,
+        d: `M ${x0 * tileWidth},${y0 * tileHeight} C ${x1 * tileWidth},${y1 * tileHeight} ${x2 * tileWidth},${y2 * tileHeight} ${x3 * tileWidth},${y3 * tileHeight}`,
         strokeOpacity: clamp(0.5 * (c0 + c3)) / 256
       };
     });
   }
 
   computePath() {
-    const {spline, props: {width, height}} = this;
+    const {spline, props: {tileWidth, tileHeight}} = this;
     const controlPoints = spline.flattenedControlPoints();
     const [x1, y1] = controlPoints[0];
-    var result = "M " + (x1 * width) + "," + (y1 * height);
+    var result = "M " + (x1 * tileWidth) + "," + (y1 * tileHeight);
     for (var i = 1; i < controlPoints.length; i += 3) {
       const [x2, y2] = controlPoints[i];
       const [x3, y3] = controlPoints[i+1];
       const [x4, y4] = controlPoints[i+2];
-      result += " C " + (x2 * width) + "," + (y2 * height)
-          + " " + (x3 * width) + "," + (y3 * height) + " " + (x4 * width) + "," + (y4 * height);
+      result += " C " + (x2 * tileWidth) + "," + (y2 * tileHeight)
+          + " " + (x3 * tileWidth) + "," + (y3 * tileHeight) + " " + (x4 * tileWidth) + "," + (y4 * tileHeight);
     }
 
     this.props.d = result;

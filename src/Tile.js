@@ -12,8 +12,8 @@ export default class Tile extends Component {
     const {curveProps,
            outlineWidth,
            outlineColor,
-           width,
-           height,
+           tileWidth,
+           tileHeight,
            transform,
            ui
           } = this.props;
@@ -29,7 +29,7 @@ export default class Tile extends Component {
       fill: "none"
     };
 
-    const rectProps = {width, height, style: rectStyle};
+    const rectProps = {width: tileWidth, height: tileHeight, style: rectStyle};
     
     const rectComp = ui && (<rect {...rectProps} />);
 
