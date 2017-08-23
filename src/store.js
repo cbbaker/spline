@@ -3,26 +3,6 @@ class Store {
     this.localStorage = localStorage;
   }
 
-  // newDocument() {
-  //   const documentIds = this.documentIds();
-  //   const id = Math.max(0, ...documentIds) + 1;
-
-  //   const n = 4;
-  //   const x0 = Math.random();
-  //   const y0 = Math.random();
-  //   const c0 = Math.random();
-  //   var int = [];
-  //   for (var i = 0; i < n; ++i) {
-  //     int.push([Math.random(), Math.random(), Math.random()]);
-  //   }
-  //   const pointLists = [[0, y0, c0], [x0, 0, c0]].map(start => {
-  //     const end = start[0] === 0 ? [1, start[1], start[2]] : [start[0], 1, start[2]];
-  //     return [start].concat(int).concat([end]);
-  //   });
-
-  //   return {id, pointLists};
-  // }
-
   newDocument() {
     const documentIds = this.documentIds();
     const id = Math.max(0, ...documentIds) + 1;
