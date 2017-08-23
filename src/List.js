@@ -21,8 +21,8 @@ export default (props) => {
     const {
       curveColor,
       curveWidth,
-      width,
-      height,
+      tileWidth,
+      tileHeight,
       pointRadius,
       pointColor,
       colorMax,
@@ -34,8 +34,8 @@ export default (props) => {
       const spline = new Spline(points, metric);
       const props = new CurveProps(spline, {
         pointList,
-        width,
-        height,
+        tileWidth,
+        tileHeight,
         pointRadius,
         pointColor,
         ui: false,
@@ -51,7 +51,7 @@ export default (props) => {
     });
   };
 
-  const {width, height} = props;
+  const {tileWidth, tileHeight} = props;
   const docs = props.store.listDocuments();
   const children = docs.map((doc) => {
     var tileProps = {
@@ -61,9 +61,9 @@ export default (props) => {
     return (
       <ListGroupItem key={doc.id}>
         <LinkContainer to={'/documents/' + doc.id}>
-          <svg width={width} height={height}>
+          <svg width={tileWidth} height={tileHeight}>
             <Tile {...tileProps}/>
-            <rect width={width} height={height} stroke="black" fill="none"/>
+            <rect width={tileWidth} height={tileHeight} stroke="black" fill="none"/>
           </svg>
         </LinkContainer>
       </ListGroupItem>

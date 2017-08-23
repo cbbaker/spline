@@ -19,7 +19,7 @@ class Work extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      containerWidth: undefined
+      width: undefined
     };
   }
 
@@ -52,10 +52,10 @@ class Work extends Component {
   }
 
   computeContainerWidth() {
-    const {containerWidth} = this.state;
+    const {width} = this.state;
     const panel = ReactDOM.findDOMNode(this.refs.panel);
-    if (containerWidth === undefined && panel) {
-      this.setState({containerWidth: panel.clientWidth - 30});
+    if (width === undefined && panel) {
+      this.setState({width: panel.clientWidth - 30});
     }
   }
 
@@ -74,12 +74,12 @@ class Work extends Component {
   }
 
   computeCurveProps() {
-    const {document: {pointLists, pointPool}, ui, dragging} = this.props;
+    const {document: {pointLists, pointPool}, dragging} = this.props;
     var {
       curveColor,
       curveWidth,
-      width,
-      height,
+      tileWidth,
+      tileHeight,
       pointRadius,
       pointColor,
       colorMax,
@@ -97,11 +97,11 @@ class Work extends Component {
       const props = new CurveProps(spline, {
         pointList,
         pointPool,
-        width,
-        height,
+        tileWidth,
+        tileHeight,
         pointRadius,
         pointColor,
-        ui,
+        ui: true,
         bezierSplit,
         stroke: curveColor,
         strokeWidth: curveWidth,
@@ -123,14 +123,14 @@ class Work extends Component {
       curveProps: this.computeCurveProps()
     };
 
-    const childProps = Object.assign(props, this.state, this.props);
+    const childProps = Object.assign(props, this.state, this.props, {ui: true});
 
-    const {containerWidth} = this.state;
-    if (containerWidth) {
-      const containerHeight = 0.75 * containerWidth;
-      const {width, height} = this.props;
-      const hCount = Math.ceil(containerWidth / width),
-            vCount = Math.ceil(containerHeight / height);
+    const {width} = this.state;
+    if (width) {
+      const height = 0.75 * width;
+      const {tileWidth, tileHeight} = this.props;
+      const hCount = Math.ceil(width / tileWidth),
+            vCount = Math.ceil(height / tileHeight);
       const tileAt = (x, y) => {
         const trans = "translate(" + x + "," + y + ")";
         return (
@@ -141,7 +141,7 @@ class Work extends Component {
       var children = [];
       for (var y = 0; y < vCount; ++y) {
         for (var x = 0; x < hCount; ++x) {
-          children.push(tileAt(x * width, y * height));
+          children.push(tileAt(x * tileWidth, y * tileHeight));
         }
       }
 
@@ -150,8 +150,8 @@ class Work extends Component {
           <Row>
             <Col sm={12} md={8}>
               <Panel>
-                <svg width={containerWidth} height={containerHeight} ref="svg">
-                  <rect width={containerWidth} height={containerHeight} stroke="black" fill="none" />
+                <svg width={width} height={height} ref="svg">
+                  <rect width={width} height={height} stroke="black" fill="none" />
                   {children}
                 </svg>
               </Panel>

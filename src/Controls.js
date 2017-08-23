@@ -1,24 +1,17 @@
 import React, {Component} from 'react';
 import {
   Panel,
-  Checkbox,
-  FormGroup
+  Button
 } from 'react-bootstrap';
+import {LinkContainer} from 'react-router-bootstrap';
 
 export default class Controls extends Component {
-  makeCheckbox() {
-    const {ui, setUI} = this.props;
-    return <Checkbox checked={ui} onChange={() => setUI(!ui)}>Show grid and points</Checkbox>;
-  }
-
   render () {
     return (
       <Panel header={<h3>controls</h3>}>
-        <form>
-          <FormGroup>
-            {this.makeCheckbox()}
-          </FormGroup>
-        </form>
+        <LinkContainer to={`/documents/${this.props.match.params.id}/preview`}>
+          <Button bsStyle='default'>Preview</Button>
+        </LinkContainer>
       </Panel>
     );
   }

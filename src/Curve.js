@@ -2,14 +2,14 @@ import React from 'react';
 import Point from './Point';
 
 export default ({
-  pointList, pointPool, ui, width, height, pointRadius, pointColor, listIdx,
+  pointList, pointPool, ui, tileWidth, tileHeight, pointRadius, pointColor, listIdx,
   onMouseDown, d, stroke, strokeWidth, fill, splinePoints, splineProps
 }) => {
   var i;
   const pointControls = ui && pointList.map((offset, pointIdx) => {
     const [x, y] = pointPool[offset];
     return (
-      <Point x={x*width} y={y*height}
+      <Point x={x*tileWidth} y={y*tileHeight}
              radius={pointRadius} color={pointColor} 
              onMouseDown={e => onMouseDown(pointIdx, e)}
              key={"[" + listIdx + "," + pointIdx + "]"}

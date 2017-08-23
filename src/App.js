@@ -13,6 +13,7 @@ import './App.css';
 import Store from './store';
 import NavBar from './NavBar';
 import Work from './Work';
+import Preview from './Preview';
 import List from './List';
 import Storage from './Storage';
 
@@ -32,26 +33,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ui: false,
       dragging: null
     };
 
     this.onMouseMove = this.mouseMoveHandler.bind(this);
     this.onMouseUp = this.mouseUpHandler.bind(this);
-  }
-
-  componentDidMount() {
-    $(document).keypress((e) => {
-      var {ui} = this.state;
-      switch (e.which) {
-      case 32: // space
-        e.preventDefault();
-        ui = !ui;
-        break;
-      default:
-      }
-      this.setState({ui});
-    });
   }
 
   onMouseDown(list, index, g) {
@@ -95,12 +81,8 @@ class App extends Component {
     this.props.store.saveDocument(this.state.document.id, this.state.document);
   }
 
-  setUI(on) {
-    this.setState({ui: on});
-  }
-
   movePoint([list, index], [newX, newY]) {
-    const {width, height} = this.props;
+    const {tileWidth, tileHeight} = this.props;
     
     var {document: {id, pointLists, pointPool}} = this.state;
     var points = pointLists[list];
@@ -108,21 +90,21 @@ class App extends Component {
 
     if (index === 0 || index === points.length - 1) {
       if (oldX === 0) {
-        var y = newY / height;
+        var y = newY / tileHeight;
         pointPool[points[0]][0] = 0;
         pointPool[points[0]][1] = y;
         pointPool[points[points.length - 1]][0] = 1;
         pointPool[points[points.length - 1]][1] = y;
       } else if (oldY === 0) {
-        var x = newX / width;
+        var x = newX / tileWidth;
         pointPool[points[0]][0] = x;
         pointPool[points[0]][1] = 0;
         pointPool[points[points.length - 1]][0] = x;
         pointPool[points[points.length - 1]][1] = 1;
       }
     } else {
-      pointPool[points[index]][0] = newX / width;
-      pointPool[points[index]][1] = newY / height;
+      pointPool[points[index]][0] = newX / tileWidth;
+      pointPool[points[index]][1] = newY / tileHeight;
     }
 
     this.setState({document: {id, pointLists, pointPool}});
@@ -134,8 +116,7 @@ class App extends Component {
     ["onMouseDown",
      "newDocument",
      "findDocument",
-     "movePoint",
-     "setUI"
+     "movePoint"
     ].forEach(method => props[method] = this[method].bind(this));
     if (this.state.document) {
       props["saveDocument"] = this.saveDocument.bind(this);
@@ -144,13 +125,15 @@ class App extends Component {
       props["setTmpPt"] = this.setTmpPt.bind(this);
     }
     Object.assign(props, this.state, this.props);
+    console.log("DEBUG: props.document: " + props.document);
 
     return (
       <Router basename='/spline'>
         <div>
           <NavBar {...props}/>
           <Route exact path='/' component={Home}/>
-          <Route path='/documents/:id' render={routeProps => (<Work {...routeProps} {...props}/>)}/>
+          <Route exact path='/documents/:id' render={routeProps => (<Work {...routeProps} {...props}/>)}/>
+          <Route path='/documents/:id/preview' render={routeProps => (<Preview {...routeProps} {...props}/>)}/>
           <Route exact path='/documents' render={routeProps => (<List {...props} />)}/>
           <Route path='/storage' render={routeProps => (<Storage {...props}/>)}/>
         </div>
@@ -161,8 +144,8 @@ class App extends Component {
 
 App.defaultProps = {
   store: new Store(window.localStorage),
-  width: 256,
-  height: 256,
+  tileWidth: 256,
+  tileHeight: 256,
   outlineWidth: 1,
   outlineColor: "rgb(200,200,200)",
   curveWidth: 2,
