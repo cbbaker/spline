@@ -33,7 +33,6 @@ class App extends Component {
     super(props);
     this.state = {
       ui: false,
-      bezierSplit: 5,
       dragging: null
     };
 
@@ -100,10 +99,6 @@ class App extends Component {
     this.setState({ui: on});
   }
 
-  setBezierSplit(iterations) {
-    this.setState({bezierSplit: iterations});
-  }
-
   movePoint([list, index], [newX, newY]) {
     const {width, height} = this.props;
     
@@ -140,8 +135,7 @@ class App extends Component {
      "newDocument",
      "findDocument",
      "movePoint",
-     "setUI",
-     "setBezierSplit"
+     "setUI"
     ].forEach(method => props[method] = this[method].bind(this));
     if (this.state.document) {
       props["saveDocument"] = this.saveDocument.bind(this);

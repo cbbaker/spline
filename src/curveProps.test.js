@@ -16,7 +16,7 @@ describe("CurveProps", () => {
   });
 
   test.skip("computes the lines", () => {
-    const props = new CurveProps(spline, {width: 1, height: 1, stroke: 1, bezierSplit: 2});
+    const props = new CurveProps(spline, {width: 1, height: 1, stroke: 1, bezierSplit: true});
     expect(props.props.splinePoints).toHaveLength(13);
   });
 
@@ -26,8 +26,8 @@ describe("CurveProps", () => {
   });
 
   test("computes the split spline drawing commands", () => {
-    const props = new CurveProps(spline, {width: 1, height: 1, stroke: 1, bezierSplit: 2});
-    expect(props.props.splineProps).toHaveLength(12);
+    const props = new CurveProps(spline, {width: 1, height: 1, stroke: 1, bezierSplit: true});
+    expect(props.props.splineProps).toHaveLength(153);
   });
 });
 

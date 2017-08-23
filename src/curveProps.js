@@ -2,7 +2,7 @@ export default class CurveProps {
   constructor(spline, defaults) {
     this.spline = spline;
     this.props = defaults;
-    if (defaults.bezierSplit !== undefined) {
+    if (defaults.bezierSplit) {
       this.computePaths();
     } else {
       this.computePath();
@@ -38,7 +38,6 @@ export default class CurveProps {
       props: {
         width,
         height,
-        bezierSplit,
         colorMin,
         colorMax
       }
