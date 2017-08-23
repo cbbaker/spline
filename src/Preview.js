@@ -68,7 +68,6 @@ class Preview extends Component {
       return (<div></div>);
     }
 
-    console.log("DEBUG: this.props.document: " + this.props.document);
     let props = {
       curveProps: this.computeCurveProps()
     };

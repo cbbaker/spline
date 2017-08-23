@@ -125,7 +125,6 @@ class App extends Component {
       props["setTmpPt"] = this.setTmpPt.bind(this);
     }
     Object.assign(props, this.state, this.props);
-    console.log("DEBUG: props.document: " + props.document);
 
     return (
       <Router basename='/spline'>
