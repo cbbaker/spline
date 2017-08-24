@@ -2,14 +2,14 @@ import Store from './store';
 
 class MockLocalStorage {
   constructor(documents) {
-    var document_ids = [];
+    var documentIds = [];
     this.data = {};
 
     for(var i = 0; i < documents.length; i++) {
-      document_ids.push(i);
+      documentIds.push(i);
       this.data["document:" + i] = JSON.stringify(documents[i]);
     }
-    this.data.document_ids = JSON.stringify(document_ids);
+    this.data.documentIds = JSON.stringify(documentIds);
   }
 
   getItem(key) {

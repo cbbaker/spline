@@ -9,12 +9,10 @@ import CurveProps from './curveProps';
 class Preview extends Component {
   componentWillMount() {
     this.init(this.props, this.state);
-    console.log("DEBUG: this.props.document: " + this.props.document);
   }
 
   componentWillUpdate(nextProps, nextState) {
     this.init(nextProps, nextState);
-    console.log("DEBUG: this.props.document: " + this.props.document);
   }
 
   init(nextProps, nextState) {
@@ -68,7 +66,6 @@ class Preview extends Component {
       return (<div></div>);
     }
 
-    console.log("DEBUG: this.props.document: " + this.props.document);
     let props = {
       curveProps: this.computeCurveProps()
     };
