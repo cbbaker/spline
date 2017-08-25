@@ -22,6 +22,7 @@ class Work extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     this.init(nextProps, nextState);
+    this.computeTmpPt();
   }
 
   init(nextProps, nextState) {
@@ -40,11 +41,13 @@ class Work extends Component {
   }
 
   computeTmpPt() {
-    const svg = ReactDOM.findDOMNode(this.refs.svg);
-    if (this.props.setTmpPt && svg && svg.createSVGPoint) {
-      const tmpPt = svg.createSVGPoint();
-      if (tmpPt) {
-        this.props.setTmpPt(tmpPt);
+    if (this.props.setTmpPt) {
+      const svg = ReactDOM.findDOMNode(this.refs.svg);
+      if (svg && svg.createSVGPoint) {
+        const tmpPt = svg.createSVGPoint();
+        if (tmpPt) {
+          this.props.setTmpPt(tmpPt);
+        }
       }
     }
   }
@@ -180,7 +183,7 @@ class Container extends Component {
               </Panel>
             </Col>
             <Col sm={4}>
-              <Controls {...this.props} />
+              {this.props.document && <Controls {...this.props} />}
             </Col>
           </Row>
         </Grid>

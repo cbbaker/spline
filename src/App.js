@@ -67,18 +67,28 @@ class App extends Component {
     this.setState({tmpPt});
   }
 
+  listDocuments(sortFn) {
+    const documents = this.props.store.listDocuments().sort(sortFn);
+    this.setState({documents, sortFn, document: null});
+  }
+
   newDocument() {
-    this.setState({document: this.props.store.newDocument()});
+    this.setState({document: this.props.store.newDocument(), documents: null});
   }
 
   findDocument(id) {
     if (!this.state.document || this.state.document.id !== id) {
-      this.setState({document: this.props.store.findDocument(id)});
+      this.setState({document: this.props.store.findDocument(id), documents: null});
     }
   }
 
   saveDocument() {
     this.props.store.saveDocument(this.state.document.id, this.state.document);
+  }
+
+  removeDocument(id) {
+    this.props.store.removeDocument(id);
+    this.listDocuments(this.state.sortFn);
   }
 
   movePoint([list, index], [newX, newY]) {
@@ -110,16 +120,27 @@ class App extends Component {
     this.setState({document: {id, pointLists, pointPool}});
   }
 
+  updateDocumentName(name) {
+    let {document} = this.state;
+    document.name = name;
+    this.setState({document});
+  }
+
   render () {
     var props = {};
 
     ["onMouseDown",
      "newDocument",
      "findDocument",
+     "listDocuments",
      "movePoint"
     ].forEach(method => props[method] = this[method].bind(this));
     if (this.state.document) {
       props["saveDocument"] = this.saveDocument.bind(this);
+      props["updateDocumentName"] = this.updateDocumentName.bind(this);
+    }
+    if (this.state.documents) {
+      props["removeDocument"] = this.removeDocument.bind(this);
     }
     if (!this.state.tmpPt) {
       props["setTmpPt"] = this.setTmpPt.bind(this);

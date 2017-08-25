@@ -6,9 +6,8 @@ import List from './List';
 it('renders without crashing', () => {
   const div = document.createElement('div');
   const props = {
-    store: {
-      listDocuments: () => []
-    }
+    listDocuments: jest.fn(),
+    documents: []
   };
 
   ReactDOM.render(
