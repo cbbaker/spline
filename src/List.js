@@ -1,9 +1,12 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {
   ListGroup,
   ListGroupItem,
   Panel,
-  Grid
+  Grid,
+  Media,
+  Button,
+  Glyphicon
 } from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
 
@@ -11,13 +14,17 @@ import Tile from './Tile';
 import Spline from './spline';
 import CurveProps from './curveProps';
 
-export default (props) => {
-  const metric = ([x1, y1], [x2, y2]) => {
-    const dx = x2 - x1, dy = y2 - y1;
-    return Math.sqrt(dx * dx + dy * dy);
-  };
+export default class List extends Component {
+  componentWillMount() {
+    this.props.listDocuments((l, r) => l.updatedAt < r.updatedAt);
+  }
 
-  const computeCurveProps = ({pointLists, pointPool}) => {
+  computeCurveProps({pointLists, pointPool}) {
+    const metric = ([x1, y1], [x2, y2]) => {
+      const dx = x2 - x1, dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
     const {
       curveColor,
       curveWidth,
@@ -27,7 +34,7 @@ export default (props) => {
       pointColor,
       colorMax,
       colorMin
-    } = props;
+    } = this.props;
 
     return pointLists.map(pointList => {
       const points = pointList.map(point => pointPool[point]);
@@ -49,32 +56,50 @@ export default (props) => {
 
       return props.props;
     });
-  };
+  }
 
-  const {tileWidth, tileHeight} = props;
-  const docs = props.store.listDocuments();
-  const children = docs.map((doc) => {
-    var tileProps = {
-      curveProps: computeCurveProps(doc)
-    };
+  render() {
+    const {documents, tileWidth, tileHeight} = this.props;
+    const children = (documents || []).map((doc) => {
+      var tileProps = {
+        curveProps: this.computeCurveProps(doc)
+      };
+
+      const createdAt = new Date(doc.createdAt), updatedAt = new Date(doc.updatedAt);
+
+      return (
+        <ListGroupItem key={doc.id}>
+          <Media>
+            <Media.Left>
+              <LinkContainer to={'/documents/' + doc.id}>
+                <svg width={tileWidth} height={tileHeight}>
+                  <Tile {...tileProps}/>
+                  <rect width={tileWidth} height={tileHeight} stroke="black" fill="none"/>
+                </svg>
+              </LinkContainer>
+            </Media.Left>
+            <Media.Body>
+              <Button className="pull-right" bsStyle="danger"
+                      onClick={() => this.props.removeDocument(doc.id)}
+                      confirm="Are you sure you want to delete this?">
+                <Glyphicon glyph="trash" />
+              </Button>
+              
+              <p><b>Name:</b> {doc.name ? doc.name : <i>untitled</i>}</p>
+              <p><b>Created at:</b> {createdAt.toLocaleDateString()} {createdAt.toLocaleTimeString()}</p>
+              <p><b>Updated at:</b> {updatedAt.toLocaleDateString()} {updatedAt.toLocaleTimeString()}</p>
+            </Media.Body>
+          </Media>
+        </ListGroupItem>
+      );
+    });
 
     return (
-      <ListGroupItem key={doc.id}>
-        <LinkContainer to={'/documents/' + doc.id}>
-          <svg width={tileWidth} height={tileHeight}>
-            <Tile {...tileProps}/>
-            <rect width={tileWidth} height={tileHeight} stroke="black" fill="none"/>
-          </svg>
-        </LinkContainer>
-      </ListGroupItem>
+      <Grid>
+        <Panel header={<h3>Saved splines:</h3>}>
+          <ListGroup>{children}</ListGroup>
+        </Panel>
+      </Grid>
     );
-  });
-
-  return (
-    <Grid>
-      <Panel header={<h3>Open file:</h3>}>
-        <ListGroup>{children}</ListGroup>
-      </Panel>
-    </Grid>
-  );
+  }
 }

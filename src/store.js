@@ -55,6 +55,10 @@ class Store {
   }
 
   saveDocument(id, document) {
+    if (document.createdAt === undefined) {
+      document.createdAt = Date.now();
+    }
+    document.updatedAt = Date.now();
     const documentIds = this.documentIds();
     if (documentIds.indexOf(id) < 0) {
       documentIds.push(id);
@@ -64,6 +68,15 @@ class Store {
     this.localStorage.setItem("document:" + id, JSON.stringify(document));
   }
 
+  removeDocument(id) {
+    const documentIds = this.documentIds();
+    const index = documentIds.indexOf(id);
+    if ( index >= 0) {
+      documentIds.splice(index, 1);
+      this.localStorage.setItem("documentIds", JSON.stringify(documentIds));
+    }
+    this.localStorage.removeItem("document:" + id);
+  }
 
   documentIds() {
     const value = this.localStorage && this.localStorage.getItem("documentIds");
