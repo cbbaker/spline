@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {withRouter} from 'react-router-dom';
+import ContainerDimensions from 'react-container-dimensions';
 import {
   Panel,
   Grid,
@@ -136,71 +137,19 @@ class Work extends Component {
   }
 }
 
-class Container extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: undefined
-    };
-    this.computeContainerWidth = this.computeContainerWidth.bind(this);
-  }
-
-  componentDidMount() {
-    this.computeContainerWidth();
-    // window.addEventListener('resize', this.computeContainerWidth); // not working--cbb 2017-08-23
-  }
-
-  componentWillUnmount() {
-    // window.removeEventListener('resize', this.computeContainerWidth);
-  }
-
-  componentDidUpdate() {
-    this.computeContainerWidth();
-  }
-
-  computeContainerWidth() {
-    const {width} = this.state;
-    const panel = ReactDOM.findDOMNode(this.refs.panel);
-    if (panel) {
-      const newWidth = panel.clientWidth - 30;
-      if (width !== newWidth) {
-        this.setState({width: newWidth});
-      }
-    }
-  }
-
-  render() {
-    const {width} = this.state;
-    if (width) {
-      const height = 0.75 * width;
-
-      return (
-        <Grid >
-          <Row>
-            <Col sm={12} md={8}>
-              <Panel>
-                <Work width={width} height={height} {...this.props}/>
-              </Panel>
-            </Col>
-            <Col sm={4}>
-              {this.props.document && <Controls {...this.props} />}
-            </Col>
-          </Row>
-        </Grid>
-      );
-    } else {
-      return (
-        <Grid >
-          <Row>
-            <Col sm={12} md={8}>
-              <Panel ref="panel">
-              </Panel>
-            </Col>
-          </Row>
-        </Grid>
-      );
-    }
-  }
-}
-
-export default withRouter(Container);
+export default withRouter((props) => (
+  <Grid >
+    <Row>
+      <Col sm={12} md={8}>
+        <Panel>
+          <ContainerDimensions>
+            { ({width}) => <Work width={width - 30} height={0.75 * (width - 30)} {...props}/> }
+          </ContainerDimensions>
+        </Panel>
+      </Col>
+      <Col sm={4}>
+        {props.document && <Controls {...props} />}
+      </Col>
+    </Row>
+  </Grid>
+));
