@@ -9,29 +9,6 @@ export default class CurveProps {
     }
   }
 
-  computeLines() {
-    const {
-      spline,
-      props: {
-        tileWidth,
-        tileHeight,
-        bezierSplit,
-        colorMin,
-        colorMax
-      }
-    } = this;
-    const splinePoints = spline.flattenedPoints(bezierSplit);
-
-    const clamp = (value) => {
-      const newValue = colorMin + (colorMax - colorMin) * value;
-      return Math.max(colorMin, Math.min(240, Math.floor(newValue)));
-    };
-
-    this.props.splinePoints = splinePoints.map(([x, y, c]) => {
-      return [x * tileWidth, y * tileHeight, clamp(c)];
-    });
-  }
-
   computePaths() {
     const {
       spline,

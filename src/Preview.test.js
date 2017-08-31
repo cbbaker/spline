@@ -11,7 +11,9 @@ it('renders without crashing', () => {
         id: 3
       }
     },
-    findDocument: jest.fn()
+    store: {
+      findDocument: jest.fn()
+    }
   };
 
   ReactDOM.render(

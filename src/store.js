@@ -30,7 +30,7 @@ class Store {
     return {id, pointLists, pointPool};
   }
   
-  listDocuments() {
+  listDocuments(sortFn) {
     const documentIds = this.documentIds();
     var documents = [];
     for(var i = 0; i < documentIds.length; i++) {
@@ -39,7 +39,7 @@ class Store {
         documents.push(JSON.parse(document));
       }
     }
-    return documents;
+    return documents.sort(sortFn);
   }
 
   findDocument(id) {

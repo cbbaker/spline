@@ -49,8 +49,8 @@ export default ({
     );
     
   } else if (splineProps !== undefined) {
-    const splines = splineProps.map(splineProp => (
-      <path strokeWidth={strokeWidth} fill={fill} stroke={stroke} {...splineProp}/>
+    const splines = splineProps.map((splineProp, index) => (
+      <path key={index} strokeWidth={strokeWidth} fill={fill} stroke={stroke} {...splineProp}/>
     ));
 
     return (
