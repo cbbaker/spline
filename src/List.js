@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import {
   ListGroup,
   ListGroupItem,
@@ -15,10 +16,6 @@ import Spline from './spline';
 import CurveProps from './curveProps';
 
 export default class List extends Component {
-  componentWillMount() {
-    this.props.listDocuments((l, r) => l.updatedAt < r.updatedAt);
-  }
-
   computeCurveProps({pointLists, pointPool}) {
     const metric = ([x1, y1], [x2, y2]) => {
       const dx = x2 - x1, dy = y2 - y1;
@@ -60,7 +57,7 @@ export default class List extends Component {
 
   render() {
     const {documents, tileWidth, tileHeight} = this.props;
-    const children = (documents || []).map((doc) => {
+    const children = (documents).map((doc) => {
       var tileProps = {
         curveProps: this.computeCurveProps(doc)
       };
@@ -80,8 +77,7 @@ export default class List extends Component {
             </Media.Left>
             <Media.Body>
               <Button className="pull-right" bsStyle="danger"
-                      onClick={() => this.props.removeDocument(doc.id)}
-                      confirm="Are you sure you want to delete this?">
+                      onClick={() => this.props.removeDocument(doc.id)}>
                 <Glyphicon glyph="trash" />
               </Button>
               
@@ -96,8 +92,15 @@ export default class List extends Component {
 
     return (
       <Grid>
-        <Panel header={<h3>Saved splines:</h3>}>
-          <ListGroup>{children}</ListGroup>
+        <Panel header={<h3>Splines:</h3>}>
+          <ListGroup>
+            <ListGroupItem key="new">
+              <Link to='/documents/new'>
+                <Button bsStyle="default" bsSize="large">Create random</Button>
+              </Link>
+            </ListGroupItem>
+            {children}
+          </ListGroup>
         </Panel>
       </Grid>
     );

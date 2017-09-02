@@ -1,13 +1,7 @@
 import React, {Component} from 'react';
 import Curve from './Curve';
-import ReactDOM from 'react-dom';
 
 export default class Tile extends Component {
-  componentDidMount() {
-    var g = ReactDOM.findDOMNode(this.refs.g);
-    this.setState({g});
-  }
-
   render() {
     const {curveProps,
            outlineWidth,
@@ -19,17 +13,19 @@ export default class Tile extends Component {
           } = this.props;
 
     const curves = curveProps.map((props, listIdx) => {
-      const onMouseDown = (idx) => this.props.onMouseDown(listIdx, idx, this.state.g);
+      const onMouseDown = (idx) => this.props.onMouseDown({point: [listIdx, idx], g: this.refs.g});
       return (<Curve key={listIdx} listIdx={listIdx} onMouseDown={onMouseDown} {...props} />);
     });
 
-    const rectStyle = {
-      stroke: outlineColor,
-      strokeWidth: outlineWidth,
-      fill: "none"
+    const rectProps = {
+      width: tileWidth,
+      height: tileHeight,
+      style: {
+        stroke: outlineColor,
+        strokeWidth: outlineWidth,
+        fill: "none"
+      }
     };
-
-    const rectProps = {width: tileWidth, height: tileHeight, style: rectStyle};
     
     const rectComp = ui && (<rect {...rectProps} />);
 

@@ -7,26 +7,28 @@ import Spline from './spline';
 import CurveProps from './curveProps';
 
 class Preview extends Component {
-  componentWillMount() {
-    this.init(this.props, this.state);
+  constructor(props) {
+    super(props);
+    this.state = this.computeState(props);
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    this.init(nextProps, nextState);
+  componentWillReceiveProps(nextProps) {
+    this.setState(this.computeState(nextProps));
   }
 
-  init(nextProps, nextState) {
-    const {match: {params: {id}}, findDocument} = nextProps;
-    findDocument(parseInt(id, 10));
-  }
-
-  metric([x1, y1], [x2, y2]) {
-    const dx = x2 - x1, dy = y2 - y1;
-    return Math.sqrt(dx * dx + dy * dy);
+  computeState({match: {params: {id}}, store}) {
+    return {
+      document: store.findDocument(parseInt(id, 10))
+    };
   }
 
   computeCurveProps() {
-    const {document: {pointLists, pointPool}} = this.props;
+    const metric = ([x1, y1], [x2, y2]) => {
+      const dx = x2 - x1, dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const {document: {pointLists, pointPool}} = this.state;
     var {
       curveColor,
       curveWidth,
@@ -40,7 +42,7 @@ class Preview extends Component {
 
     return pointLists.map(pointList => {
       const points = pointList.map(point => pointPool[point]);
-      const spline = new Spline(points, this.metric);
+      const spline = new Spline(points, metric);
       const props = new CurveProps(spline, {
         pointList,
         pointPool,
@@ -62,7 +64,7 @@ class Preview extends Component {
   }
 
   render() {
-    if (!this.props.document) {
+    if (!this.state.document) {
       return (<div></div>);
     }
 
