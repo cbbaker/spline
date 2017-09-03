@@ -2,7 +2,8 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Link
+  Link,
+  Switch
 } from 'react-router-dom';
 import {Jumbotron, Grid, Button} from 'react-bootstrap';
 
@@ -12,6 +13,7 @@ import Store from './store';
 import NavBar from './NavBar';
 import Index from './DocumentIndex';
 import Show from './DocumentShow';
+import New from './DocumentNew';
 import Preview from './Preview';
 import Storage from './Storage';
 
@@ -31,11 +33,14 @@ const App = (props) => (
   <Router basename='/spline'>
     <div>
       <NavBar {...props}/>
-      <Route exact path='/' component={Home}/>
-      <Route exact path='/documents/:id' render={routeProps => (<Show {...routeProps} {...props}/>)}/>
-      <Route path='/documents/:id/preview' render={routeProps => (<Preview {...routeProps} {...props}/>)}/>
-      <Route exact path='/documents' render={routeProps => (<Index {...props} />)}/>
-      <Route path='/storage' render={routeProps => (<Storage {...props}/>)}/>
+      <Switch>
+        <Route path='/documents/:id/preview' render={routeProps => (<Preview {...routeProps} {...props}/>)}/>
+        <Route path='/documents/new' render={routeProps => (<New {...routeProps} {...props}/>)}/>
+        <Route path='/documents/:id' render={routeProps => (<Show {...routeProps} {...props}/>)}/>
+        <Route path='/documents' render={routeProps => (<Index {...props} />)}/>
+        <Route path='/storage' render={routeProps => (<Storage {...props}/>)}/>
+        <Route path='/' component={Home}/>
+      </Switch>
     </div>
     </Router>
 );

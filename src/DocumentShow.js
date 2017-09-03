@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Redirect} from 'react-router-dom';
 import Tiler from './Tiler';
 import {Grid, Alert} from 'react-bootstrap';
 
@@ -18,25 +17,16 @@ export default class Show extends Component {
   }
 
   computeState(id, store) {
-    if (id === 'new') {
-      const document = store.newDocument();
-      store.saveDocument(document.id, document);
+    const document = store.findDocument(parseInt(id, 10));
+    if (document) {
       return {
-        type: "redirecting",
-        path: `/documents/${document.id}`
+        type: "loaded",
+        document
       };
     } else {
-      const document = store.findDocument(parseInt(id, 10));
-      if (document) {
-        return {
-          type: "loaded",
-          document
-        };
-      } else {
-        return {
-          type: "not found"
-        };
-      }
+      return {
+        type: "not found"
+      };
     }
   }
 
@@ -110,8 +100,6 @@ export default class Show extends Component {
 
   render() {
     switch (this.state.type) {
-    case "redirecting":
-      return (<Redirect to={this.state.path} />);
     case "loaded":
         return (
           <Tiler updateDocumentName={this.updateDocumentName}
