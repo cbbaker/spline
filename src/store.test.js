@@ -26,6 +26,11 @@ class MockLocalStorage {
 }
 
 describe("Store", () => {
+  test("nextId gets the next id to use to save something", () => {
+    const store = new Store(new MockLocalStorage(["thing1", "thing2"]));
+    expect(store.nextId()).toBe(2);
+  });
+
   test("newDocument creates a random document", () => {
     const store = new Store(new MockLocalStorage(["thing1", "thing2"]));
     const document = store.newDocument();

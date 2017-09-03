@@ -3,6 +3,11 @@ class Store {
     this.localStorage = localStorage;
   }
 
+  nextId() {
+    const documentIds = this.documentIds();
+    return Math.max(0, ...documentIds) + 1;
+  }
+
   newDocument() {
     const documentIds = this.documentIds();
     const id = Math.max(0, ...documentIds) + 1;
