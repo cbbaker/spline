@@ -9,11 +9,20 @@ export default class Show extends Component {
   constructor(props) {
     super(props);
     const {match: {params: {id}}, store} = props;
-    this.state = this.computeState(id, store);
+    let state = this.computeState(id, store);
 
-    ["onMouseDown", "onMouseMove", "onMouseUp", "updateDocumentName"].forEach(name => {
+    ["onMouseDownPoint",
+     "onMouseDownOther",
+     "onMouseMove",
+     "onMouseUp",
+     "updateDocumentName",
+     "updatePointColor"
+    ].forEach(name => {
       this[name] = this[name].bind(this);
+      state[name] = this[name];
     });
+
+    this.state = state;
   }
 
   computeState(id, store) {
@@ -21,6 +30,7 @@ export default class Show extends Component {
     if (document) {
       return {
         type: "loaded",
+        dirty: false,
         document
       };
     } else {
@@ -37,35 +47,53 @@ export default class Show extends Component {
     }
   }
 
-  onMouseDown(dragging) {
-    this.setState({dragging});
+  componentDidMount() {
     $(document).mousemove(this.onMouseMove);
     $(document).mouseup(this.onMouseUp);
   }
 
+  componentWillUnmount() {
+    $(document).unbind('mousemove', this.onMouseMove);
+    $(document).unbind('mouseup', this.onMouseUp);
+  }
+
+  onMouseDownPoint(tile, selection) {
+    console.log("DEBUG: onMouseDownPoint selection: " + JSON.stringify(selection, null, 2));
+    this.setState({selection, tile, dragging: true});
+  }
+
+  onMouseDownOther() {
+    console.log("onMouseDownOther");
+    this.setState({selection: undefined});
+  }
+
   onMouseMove(e) {
-    var {dragging} = this.state;
-    if (dragging !== null) {
-      let g = ReactDOM.findDOMNode(dragging.g);
+    var {dragging, selection, tile} = this.state;
+    if (dragging && selection !== undefined && selection.type === "point") {
+      console.log("onMouseMove");
+      let g = ReactDOM.findDOMNode(tile);
       let tmpPt = g.parentElement.createSVGPoint();
       tmpPt.x = e.clientX;
       tmpPt.y = e.clientY;
       var local = tmpPt.matrixTransform(g.getScreenCTM().inverse());
-      this.movePoint(dragging, [local.x, local.y]);
+      this.movePoint(selection, [local.x, local.y]);
     }
   }
 
   onMouseUp(e) {
-    this.setState({dragging: null});
-    $(document).unbind('mousemove', this.onMouseMove);
-    $(document).unbind('mouseup', this.onMouseUp);
-    this.props.store.saveDocument(this.state.document.id, this.state.document);
+    console.log("onMouseUp");
+    const {document} = this.state;
+    this.setState({dragging: false});
+    if (this.state.dirty) {
+      this.props.store.saveDocument(document.id, document);
+      this.setState({dirty: false});
+    }
   }
 
-  movePoint({point: [list, index]}, [newX, newY]) {
+  movePoint({which: [list, index]}, [newX, newY]) {
     const {tileWidth, tileHeight} = this.props;
     
-    var {document: {id, pointLists, pointPool}} = this.state;
+    var {document: {id, name, pointLists, pointPool}} = this.state;
     var points = pointLists[list];
     var [oldX, oldY] = pointPool[points[index]];
 
@@ -88,26 +116,38 @@ export default class Show extends Component {
       pointPool[points[index]][1] = newY / tileHeight;
     }
 
-    this.setState({document: {id, pointLists, pointPool}});
+    this.setState({document: {id, name, pointLists, pointPool}, dirty: true});
+  }
+
+  updatePointColor({point: [listIdx, pointIdx]}, color) {
+    let {document: {id, name, pointLists, pointPool}} = this.state;
+    let points = pointLists[listIdx];
+
+    if (pointIdx === 0 || pointIdx === points.length - 1) {
+      pointPool[points[0]][2] = color;
+      pointPool[points[points.length - 1]][2] = color;
+    } else {
+      pointPool[points[pointIdx]][2] = color;
+    }
+
+    this.setState({document: {id, name, pointLists, pointPool}});
+    this.props.store.saveDocument(this.state.document.id, this.state.document);
   }
 
   updateDocumentName(name) {
     let {document} = this.state;
-    document.name = name;
-    this.setState({document});
-    this.props.store.saveDocument(document.id, document);
+    if (document.name !== name) {
+      document.name = name;
+      this.setState({document});
+      this.props.store.saveDocument(document.id, document);
+    }
   }
 
   render() {
     switch (this.state.type) {
     case "loaded":
         return (
-          <Tiler updateDocumentName={this.updateDocumentName}
-            onMouseDown={this.onMouseDown}
-            {...this.state}
-            {...this.props}
-          />
-        );
+    <Tiler {...this.state} {...this.props} />);
     default:
       return (<Grid><Alert bsStyle='danger'>Document not found.</Alert></Grid>);
     }

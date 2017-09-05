@@ -20,7 +20,7 @@ const SVG = (props) => {
       return Math.sqrt(dx * dx + dy * dy);
     };
 
-    const {document: {pointLists, pointPool}, dragging} = props;
+    const {document: {pointLists, pointPool}, dragging, selection} = props;
     var {
       curveColor,
       curveWidth,
@@ -41,6 +41,7 @@ const SVG = (props) => {
       const points = pointList.map(point => pointPool[point]);
       const spline = new Spline(points, metric);
       const props = new CurveProps(spline, {
+        selection,
         pointList,
         pointPool,
         tileWidth,
@@ -90,7 +91,7 @@ const SVG = (props) => {
 };
 
 export default (props) => (
-  <Grid >
+  <Grid onMouseDown={props.onMouseDownOther}>
     <Row>
       <Col sm={12} md={8}>
         <Panel>
@@ -100,7 +101,7 @@ export default (props) => (
         </Panel>
       </Col>
       <Col sm={4}>
-        {props.document && <Controls {...props} />}
+        <Controls {...props} />
       </Col>
     </Row>
   </Grid>
