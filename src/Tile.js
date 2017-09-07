@@ -9,12 +9,17 @@ export default class Tile extends Component {
            tileWidth,
            tileHeight,
            transform,
-           ui
+           ui,
+           onMouseDownPoint
           } = this.props;
 
     const curves = curveProps.map((props, listIdx) => {
-      const onMouseDown = (idx) => this.props.onMouseDown({point: [listIdx, idx], g: this.refs.g});
-      return (<Curve key={listIdx} listIdx={listIdx} onMouseDown={onMouseDown} {...props} />);
+      return (
+        <Curve key={listIdx}
+          listIdx={listIdx}
+          onMouseDownPoint={onMouseDownPoint && onMouseDownPoint.bind(null, this.refs.g)}
+          {...props} />
+      );
     });
 
     const rectProps = {

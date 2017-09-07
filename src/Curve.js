@@ -3,15 +3,26 @@ import Point from './Point';
 
 export default ({
   pointList, pointPool, ui, tileWidth, tileHeight, pointRadius, pointColor, listIdx,
-  onMouseDown, d, stroke, strokeWidth, fill, splinePoints, splineProps
+  onMouseDownPoint, d, stroke, strokeWidth, fill, splinePoints, splineProps, selection
 }) => {
   var i;
   const pointControls = ui && pointList.map((offset, pointIdx) => {
     const [x, y] = pointPool[offset];
+    let radius = pointRadius;
+    if (selection !== undefined
+        && selection.type === "point"
+        && selection.which[0] === listIdx
+        && selection.which[1] === pointIdx) {
+      radius *= 1.5;
+    }
+    const onMouseDown = (e) => {
+      e.stopPropagation();
+      return onMouseDownPoint({type: "point", which: [listIdx, pointIdx]});
+    };
     return (
       <Point x={x*tileWidth} y={y*tileHeight}
-             radius={pointRadius} color={pointColor} 
-             onMouseDown={e => onMouseDown(pointIdx, e)}
+             radius={radius} color={pointColor} 
+             onMouseDown={onMouseDown}
              key={"[" + listIdx + "," + pointIdx + "]"}
              />
     );

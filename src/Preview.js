@@ -74,8 +74,7 @@ class Preview extends Component {
 
     const childProps = Object.assign(props, this.state, this.props, {ui: false});
 
-    const {width} = this.props;
-    const height = 0.75 * width;
+    const {width, height} = this.props;
     const {tileWidth, tileHeight} = this.props;
     const hCount = Math.ceil(width / tileWidth),
           vCount = Math.ceil(height / tileHeight);
@@ -105,8 +104,14 @@ class Preview extends Component {
 class Full extends Component {
   componentDidMount() {
     const screen = ReactDOM.findDOMNode(this.refs.screen);
-    if (screen && screen.requestFullScreen) {
-      screen.requestFullScreen();
+    if (screen) {
+      const requestFullScreen = screen.requestFullscreen
+              || screen.webkitRequestFullScreen
+              || screen.mozRequestFullScreen
+              || screen.msRequestFullscreen;
+      if (requestFullScreen) {
+        requestFullScreen.call(screen);
+      }
     }
   }
 
