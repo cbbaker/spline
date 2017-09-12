@@ -9,10 +9,9 @@ import {
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
-import {LinkContainer} from 'react-router-bootstrap';
-
 const DocumentControls = ({
     updateDocumentName,
+    onPreview,
     document: {name},
     match: {
       params: {id}
@@ -30,9 +29,7 @@ const DocumentControls = ({
                        type='text' value={name} />
         </FormGroup>
       </form>
-        <LinkContainer to={`/documents/${id}/preview`}>
-        <Button bsStyle='default'>Preview</Button>
-      </LinkContainer>
+      <Button onClick={onPreview} bsStyle='default'>Preview</Button>
     </Panel>
   );
 };
@@ -53,7 +50,7 @@ const PointControls = ({
   
   return (
     <Panel>
-      Location: {`(${point[0]}, ${point[1]})`}
+      Shade:
       <Slider min={0} max={1} step={0.01} value={point[2]} onChange={onChange}/>
     </Panel>
   );

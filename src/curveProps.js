@@ -14,24 +14,21 @@ export default class CurveProps {
       spline,
       props: {
         tileWidth,
-        tileHeight,
-        colorMin,
-        colorMax
+        tileHeight
       }
     } = this;
     const colorDiffSmall = ({controls: [[x0, y0, c0], p1, p2, [x3, y3, c3]]}) => (Math.abs(c3 - c0) < 0.02);
     const splines = spline.adaptiveSplit(colorDiffSmall);
 
     const clamp = (value) => {
-      const newValue = colorMin + (colorMax - colorMin) * value;
-      return Math.max(colorMin, Math.min(240, Math.floor(newValue)));
+      return Math.max(0, Math.min(1, value));
     };
 
     this.props.splineProps = splines.map(spline => {
       const [[x0, y0, c0], [x1, y1], [x2, y2], [x3, y3, c3]] = spline.controls;
       return {
         d: `M ${x0 * tileWidth},${y0 * tileHeight} C ${x1 * tileWidth},${y1 * tileHeight} ${x2 * tileWidth},${y2 * tileHeight} ${x3 * tileWidth},${y3 * tileHeight}`,
-        strokeOpacity: clamp(0.5 * (c0 + c3)) / 256
+        strokeOpacity: clamp(0.5 * (c0 + c3))
       };
     });
   }

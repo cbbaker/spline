@@ -3,85 +3,22 @@ import ReactDOM from 'react-dom';
 import FullScreen from 'react-fullscreen';
 import Tile from './Tile';
 
-import Spline from './spline';
-import CurveProps from './curveProps';
+const Preview = (props) => {
+  const {width, height} = props;
 
-class Preview extends Component {
-  constructor(props) {
-    super(props);
-    this.state = this.computeState(props);
-  }
+  if (document.fullscreenElement
+      || document.webkitFullscreenElement
+      || document.mozFullscreenElement
+      || document.msFullscreenElement) {
+    const childProps = Object.assign({}, props, {ui: false});
 
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.computeState(nextProps));
-  }
-
-  computeState({match: {params: {id}}, store}) {
-    return {
-      document: store.findDocument(parseInt(id, 10))
-    };
-  }
-
-  computeCurveProps() {
-    const metric = ([x1, y1], [x2, y2]) => {
-      const dx = x2 - x1, dy = y2 - y1;
-      return Math.sqrt(dx * dx + dy * dy);
-    };
-
-    const {document: {pointLists, pointPool}} = this.state;
-    var {
-      curveColor,
-      curveWidth,
-      tileWidth,
-      tileHeight,
-      pointRadius,
-      pointColor,
-      colorMax,
-      colorMin
-    } = this.props;
-
-    return pointLists.map(pointList => {
-      const points = pointList.map(point => pointPool[point]);
-      const spline = new Spline(points, metric);
-      const props = new CurveProps(spline, {
-        pointList,
-        pointPool,
-        tileWidth,
-        tileHeight,
-        pointRadius,
-        pointColor,
-        ui: false,
-        bezierSplit: true,
-        stroke: curveColor,
-        strokeWidth: curveWidth,
-        fill: "none",
-        colorMax,
-        colorMin
-      });
-
-      return props.props;
-    });
-  }
-
-  render() {
-    if (!this.state.document) {
-      return (<div></div>);
-    }
-
-    let props = {
-      curveProps: this.computeCurveProps()
-    };
-
-    const childProps = Object.assign(props, this.state, this.props, {ui: false});
-
-    const {width, height} = this.props;
-    const {tileWidth, tileHeight} = this.props;
+    const {tileWidth, tileHeight} = props;
     const hCount = Math.ceil(width / tileWidth),
           vCount = Math.ceil(height / tileHeight);
     const tileAt = (x, y) => {
       const trans = "translate(" + x + "," + y + ")";
       return (
-        <Tile key={trans} transform={trans} {...childProps} />
+        <Tile key={trans} transform={trans} {...childProps} ui={false} />
       );
     };
 
@@ -93,13 +30,16 @@ class Preview extends Component {
     }
 
     return (
-      <svg width={width} height={height} ref="svg">
-        <rect width={width} height={height} stroke="black" fill="none" />
+      <svg width={width} height={height}>
         {children}
       </svg>
     );
   }
-}
+  return (
+    <svg width={width} height={height}>
+    </svg>
+  );
+};
 
 class Full extends Component {
   componentDidMount() {

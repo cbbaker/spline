@@ -28,9 +28,7 @@ export default class List extends Component {
       tileWidth,
       tileHeight,
       pointRadius,
-      pointColor,
-      colorMax,
-      colorMin
+      pointColor
     } = this.props;
 
     return pointLists.map(pointList => {
@@ -42,13 +40,10 @@ export default class List extends Component {
         tileHeight,
         pointRadius,
         pointColor,
-        ui: false,
         bezierSplit: true,
         stroke: curveColor,
         strokeWidth: curveWidth,
-        fill: "none",
-        colorMax,
-        colorMin
+        fill: "none"
       });
 
       return props.props;
