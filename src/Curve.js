@@ -5,7 +5,6 @@ export default ({
   pointList, pointPool, ui, tileWidth, tileHeight, pointRadius, pointColor, listIdx,
   onMouseDownPoint, d, stroke, strokeWidth, fill, splinePoints, splineProps, selection
 }) => {
-  var i;
   const pointControls = ui && pointList.map((offset, pointIdx) => {
     const [x, y] = pointPool[offset];
     let radius = pointRadius;
@@ -37,31 +36,9 @@ export default ({
         {pointControls}
       </g>
     );
-  } else if (splinePoints !== undefined) {
-    var lines = [];
-    for(i = 1; i < splinePoints.length; i++) {
-      let [x1, y1] = splinePoints[i-1], [x2, y2, c2] = splinePoints[i];
-      const lineProps = {
-        key: i,
-        x1, y1, x2, y2,
-        stroke: "black",
-        strokeWidth,
-        strokeOpacity: c2 / 256
-      };
-      
-      lines.push(<line {...lineProps} />);
-    }
-
-    return (
-      <g>
-        {lines}
-        {pointControls}
-      </g>
-    );
-    
   } else if (splineProps !== undefined) {
     const splines = splineProps.map((splineProp, index) => (
-      <path key={index} strokeWidth={strokeWidth} fill={fill} stroke={stroke} {...splineProp}/>
+      <path key={index} strokeWidth={strokeWidth} fill={fill} stroke="black" {...splineProp}/>
     ));
 
     return (

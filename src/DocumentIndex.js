@@ -17,7 +17,15 @@ export default class Index extends Component {
 
   computeState() {
     return {
-      documents: this.props.store.listDocuments((l, r) => l.updatedAt < r.updatedAt)
+      documents: this.props.store.listDocuments((l, r) => {
+        if (l.updatedAt < r.updatedAt) {
+          return 1;
+        }
+        if (l.updatedAt === r.updatedAt) {
+          return 0;
+        }
+        return -1;
+      })
     };
   }
 

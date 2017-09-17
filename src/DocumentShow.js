@@ -11,11 +11,14 @@ export default class Show extends Component {
     const {match: {params: {id}}, store} = props;
     let state = this.computeState(id, store);
 
-    ["onMouseDownPoint",
+    ["onFullScreenChange",
+     "onFullScreenError",
+     "onMouseDownPoint",
      "onMouseDownOther",
      "onMouseMove",
      "onMouseUp",
      "updateDocumentName",
+     "onPreview",
      "updatePointColor"
     ].forEach(name => {
       this[name] = this[name].bind(this);
@@ -31,6 +34,7 @@ export default class Show extends Component {
       return {
         type: "loaded",
         dirty: false,
+        preview: false,
         document
       };
     } else {
@@ -50,11 +54,42 @@ export default class Show extends Component {
   componentDidMount() {
     $(document).mousemove(this.onMouseMove);
     $(document).mouseup(this.onMouseUp);
+    $(document).keyup(this.onKeyUp);
+    $(document).bind("webkitfullscreenchange", this.onFullScreenChange);
+    $(document).bind("mozfullscreenchange", this.onFullScreenChange);
+    $(document).bind("msfullscreenchange", this.onFullScreenChange);
+    $(document).bind("fullscreenchange", this.onFullScreenChange);
+    $(document).bind("webkitfullscreenerror", this.onFullScreenError);
+    $(document).bind("mozfullscreenerror", this.onFullScreenError);
+    $(document).bind("msfullscreenerror", this.onFullScreenError);
+    $(document).bind("fullscreenerror", this.onFullScreenError);
   }
 
   componentWillUnmount() {
     $(document).unbind('mousemove', this.onMouseMove);
     $(document).unbind('mouseup', this.onMouseUp);
+    $(document).unbind('keyup', this.onKeyUp);
+    $(document).unbind('fullscreenchange', this.onFullScreenChange);
+    $(document).unbind('webkitfullscreenchange', this.onFullScreenChange);
+    $(document).unbind('mozfullscreenchange', this.onFullScreenChange);
+    $(document).unbind('msfullscreenchange', this.onFullScreenChange);
+    $(document).unbind('fullscreenerror', this.onFullScreenError);
+    $(document).unbind('webkitfullscreenerror', this.onFullScreenError);
+    $(document).unbind('mozfullscreenerror', this.onFullScreenError);
+    $(document).unbind('msfullscreenerror', this.onFullScreenError);
+  }
+
+  onFullScreenChange(event) {
+    if (!(document.fullscreenElement
+          || document.webkitFullscreenElement
+          || document.mozFullscreenElement
+          || document.msFullscreenElement)) {
+      this.setState({preview: false});
+    }
+  }
+
+  onFullScreenError(event) {
+    this.setState({preview: false});
   }
 
   onMouseDownPoint(tile, selection) {
@@ -88,6 +123,10 @@ export default class Show extends Component {
       this.props.store.saveDocument(document.id, document);
       this.setState({dirty: false});
     }
+  }
+
+  onPreview() {
+    this.setState({preview: true});
   }
 
   movePoint({which: [list, index]}, [newX, newY]) {
@@ -146,8 +185,7 @@ export default class Show extends Component {
   render() {
     switch (this.state.type) {
     case "loaded":
-        return (
-    <Tiler {...this.state} {...this.props} />);
+      return (<Tiler {...this.state} {...this.props} />);
     default:
       return (<Grid><Alert bsStyle='danger'>Document not found.</Alert></Grid>);
     }

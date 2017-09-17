@@ -18,7 +18,7 @@ export default class Tile extends Component {
         <Curve key={listIdx}
           listIdx={listIdx}
           onMouseDownPoint={onMouseDownPoint && onMouseDownPoint.bind(null, this.refs.g)}
-          {...props} />
+               {...props} ui={ui}/>
       );
     });
 
