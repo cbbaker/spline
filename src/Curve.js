@@ -3,7 +3,7 @@ import Point from './Point';
 
 export default ({
   pointList, pointPool, ui, tileWidth, tileHeight, pointRadius, pointColor, listIdx,
-  onMouseDownPoint, d, stroke, strokeWidth, fill, splinePoints, splineProps, selection
+  onMouseDownPoint, onTouchStartPoint, d, stroke, strokeWidth, fill, splinePoints, splineProps, selection
 }) => {
   const pointControls = ui && pointList.map((offset, pointIdx) => {
     const [x, y] = pointPool[offset];
@@ -18,10 +18,19 @@ export default ({
       e.stopPropagation();
       return onMouseDownPoint({type: "point", which: [listIdx, pointIdx]});
     };
+    const onTouchStart = (e) => {
+      if (e.touches.length === 1) {
+        e.preventDefault();
+        e.stopPropagation();
+        return onTouchStartPoint({type: "point", which: [listIdx, pointIdx]});
+      }
+      return false;
+    };
     return (
       <Point x={x*tileWidth} y={y*tileHeight}
              radius={radius} color={pointColor} 
              onMouseDown={onMouseDown}
+             onTouchStart={onTouchStart}
              key={"[" + listIdx + "," + pointIdx + "]"}
              />
     );

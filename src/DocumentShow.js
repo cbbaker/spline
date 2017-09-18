@@ -17,6 +17,9 @@ export default class Show extends Component {
      "onMouseDownOther",
      "onMouseMove",
      "onMouseUp",
+     "onTouchMove",
+     "onTouchEnd",
+     "onTouchStartPoint",
      "updateDocumentName",
      "onPreview",
      "updatePointColor"
@@ -53,7 +56,9 @@ export default class Show extends Component {
 
   componentDidMount() {
     $(document).mousemove(this.onMouseMove);
+    $(document).bind("touchmove", this.onTouchMove);
     $(document).mouseup(this.onMouseUp);
+    $(document).bind("touchend", this.onTouchEnd);
     $(document).keyup(this.onKeyUp);
     $(document).bind("webkitfullscreenchange", this.onFullScreenChange);
     $(document).bind("mozfullscreenchange", this.onFullScreenChange);
@@ -67,7 +72,9 @@ export default class Show extends Component {
 
   componentWillUnmount() {
     $(document).unbind('mousemove', this.onMouseMove);
+    $(document).unbind("touchmove", this.onTouchMove);
     $(document).unbind('mouseup', this.onMouseUp);
+    $(document).unbind("touchend", this.onTouchEnd);
     $(document).unbind('keyup', this.onKeyUp);
     $(document).unbind('fullscreenchange', this.onFullScreenChange);
     $(document).unbind('webkitfullscreenchange', this.onFullScreenChange);
@@ -96,6 +103,9 @@ export default class Show extends Component {
     console.log("DEBUG: onMouseDownPoint selection: " + JSON.stringify(selection, null, 2));
     this.setState({selection, tile, dragging: true});
   }
+  onTouchStartPoint(tile, selection) {
+    this.setState({selection, tile, dragging: true});
+  }
 
   onMouseDownOther() {
     console.log("onMouseDownOther");
@@ -115,6 +125,23 @@ export default class Show extends Component {
     }
   }
 
+  onTouchMove(e) {
+    if (e.touches.length === 1) {
+      var {dragging, selection, tile} = this.state;
+      if (dragging && selection !== undefined && selection.type === "point") {
+        e.preventDefault();
+        console.log("onTouchMove");
+        let g = ReactDOM.findDOMNode(tile);
+        let tmpPt = g.parentElement.createSVGPoint();
+        let touch = e.touches[0];
+        tmpPt.x = touch.clientX;
+        tmpPt.y = touch.clientY;
+        var local = tmpPt.matrixTransform(g.getScreenCTM().inverse());
+        this.movePoint(selection, [local.x, local.y]);
+      }
+    }
+  }
+
   onMouseUp(e) {
     console.log("onMouseUp");
     const {document} = this.state;
@@ -125,6 +152,21 @@ export default class Show extends Component {
     }
   }
 
+  onTouchEnd(e) {
+    if (e.touches.length === 0) {
+      console.log("onTouchEnd");
+      if (this.state.dragging === true) {
+        e.preventDefault();
+        const {document} = this.state;
+        this.setState({dragging: false});
+        if (this.state.dirty) {
+          this.props.store.saveDocument(document.id, document);
+          this.setState({dirty: false});
+        }
+      }
+    }
+  }
+  
   onPreview() {
     this.setState({preview: true});
   }

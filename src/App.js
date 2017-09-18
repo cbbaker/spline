@@ -45,13 +45,13 @@ const App = (props) => (
 
 App.defaultProps = {
   store: new Store(window.localStorage),
-  tileWidth: 256,
-  tileHeight: 256,
+  tileWidth: 192,
+  tileHeight: 192,
   outlineWidth: 1,
   outlineColor: "rgb(200,200,200)",
   curveWidth: 2,
   curveColor: "rgb(16,16, 16)",
-  pointRadius: 5,
+  pointRadius: 6,
   pointColor: "rgb(100,200,200)"
 };
 

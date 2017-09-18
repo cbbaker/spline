@@ -10,7 +10,8 @@ export default class Tile extends Component {
            tileHeight,
            transform,
            ui,
-           onMouseDownPoint
+           onMouseDownPoint,
+           onTouchStartPoint
           } = this.props;
 
     const curves = curveProps.map((props, listIdx) => {
@@ -18,6 +19,7 @@ export default class Tile extends Component {
         <Curve key={listIdx}
           listIdx={listIdx}
           onMouseDownPoint={onMouseDownPoint && onMouseDownPoint.bind(null, this.refs.g)}
+          onTouchStartPoint={onTouchStartPoint && onTouchStartPoint.bind(null, this.refs.g)}
                {...props} ui={ui}/>
       );
     });
